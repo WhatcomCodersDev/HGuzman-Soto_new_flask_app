@@ -1,0 +1,26 @@
+runtime: python39 # Specify the Python runtime version.
+entrypoint: gunicorn -b :$PORT run:app # Define the command to start your application.
+
+env: standard # Specify the environment type; choose 'standard' for most cases.
+
+instance_class: F1 # The class of instance, F1 is the smallest and least expensive.
+
+automatic_scaling: # Configuration for scaling behavior.
+  target_cpu_utilization: 0.6 # Target CPU utilization before scaling up.
+  max_instances: 1 # Maximum number of instances to run.
+
+# Environment variables that your application uses.
+env_variables:
+  SECRET_KEY: 'your-secret-key'
+  DATABASE_URL: 'your-database-url'
+
+handlers: # Define how URLs are handled by your application.
+  - url: /static # Route for static files.
+    static_dir: static/ # Directory in your project that holds static files.
+    secure: always # Optional: Force HTTPS for this handler.
+    http_headers: # Optional: Set HTTP headers for this handler.
+      Cache-Control: 'no-cache, no-store, must-revalidate'
+
+  - url: /.* # Default handler for all URLs.
+    script: auto # Automatically route requests to your application.
+    secure: always # Optional: Force HTTPS for all requests.

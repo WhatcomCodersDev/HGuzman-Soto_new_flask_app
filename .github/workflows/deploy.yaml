@@ -1,0 +1,28 @@
+name: Initialize App Engine Deployment
+
+on:
+  push:
+    branches: [main]
+    # This ensures it only runs on the first push to main, which typically
+    # occurs when the repository is first created and the main branch is populated.
+  create:
+    # This triggers when the repository is created if you want immediate setup.
+
+jobs:
+  setup-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure GCP Credentials
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Deploy to Google App Engine
+        run: |
+          gcloud app deploy --version=$GITHUB_SHA --project=${{ secrets.GCP_PROJECT_ID }} --quiet
+          echo "Deployed version $GITHUB_SHA to App Engine"
